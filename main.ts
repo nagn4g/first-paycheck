@@ -38,8 +38,17 @@ if (typeof record !== 'object' || record === null || Array.isArray(record)) {
   process.exit(1);
 }
 const { mint, create_signature } = record as Record<string, unknown>;
+const keys = Object.keys(record as Record<string, unknown>).sort();
+if (keys.length !== 2 || keys[0] !== 'create_signature' || keys[1] !== 'mint') {
+  console.error('LAUNCH.json must hold exactly mint and create_signature');
+  process.exit(1);
+}
 if (!isBase58(mint, 32, 44)) {
   console.error('LAUNCH.json has no valid mint (base58, 32-44 characters)');
+  process.exit(1);
+}
+if (typeof mint === 'string' && !mint.endsWith('pump')) {
+  console.error('LAUNCH.json mint is not a pump.fun mint (must end in "pump")');
   process.exit(1);
 }
 if (!isBase58(create_signature, 64, 88)) {
